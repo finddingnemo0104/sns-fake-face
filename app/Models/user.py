@@ -35,9 +35,10 @@ def create_user():
         dob=datetime.now(),
         biography="",
         phone="0123456789",
-        email="fb@vn.com",
+        email="thuytrang@gmail.com",
         created_at=datetime.now(),
         updated_at=datetime.now(),)
 
     db.session.add(user)
     db.session.commit()
+
