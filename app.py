@@ -1,12 +1,8 @@
-from flask import Flask, render_template
+from app import create_app, db
 
-app = Flask(__name__)
-
-
-@app.route('/')
-def hello_world():  # put application's code here
-    return render_template('login.html', title="My Flask App ", heading="Hello, Flask!")
-
+app = create_app()
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
     app.run()
