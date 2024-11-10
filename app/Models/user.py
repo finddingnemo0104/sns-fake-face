@@ -35,7 +35,7 @@ def create_user():
         dob=datetime.now(),
         biography="",
         phone="0123456789",
-        email="thuytrang@gmail.com",
+        email="thuytrangD@gmail.com",
         created_at=datetime.now(),
         updated_at=datetime.now(),)
 
