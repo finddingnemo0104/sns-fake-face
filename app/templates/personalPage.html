@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook-like Homepage</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Additional styling for custom look */
+        body {
+            background-color: #f0f2f5;
+        }
+        .navbar {
+            background-color: #4267B2;
+            color: white;
+        }
+        .navbar-brand, .navbar-nav .nav-link {
+            color: white !important;
+        }
+        .notification-icon {
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .sidebar {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .suggestions {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .post {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .new-post-area {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .new-post-textarea {
+            width: 100%;
+            resize: none;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .icon-picture {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #4267B2;
+        }
+        /* Bulletin board styles */
+        .bulletin-board {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: white;
+            border-left: 1px solid #ddd;
+            overflow-y: auto;
+            transition: right 0.3s ease;
+            z-index: 1050;
+            padding: 15px;
+        }
+        .bulletin-board.active {
+            right: 0;
+        }
+
+        /* profile */
+        .profile-header {
+            position: relative;
+            height: 300px;
+        }
+        .cover-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar {
+            position: absolute;
+            bottom: -10px;
+            left: 30px;
+            width: 100px;
+            height: 100px;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .profile-info {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            position: absolute;
+            bottom: 10px;
+            left: 150px;
+            color: rgb(33, 29, 29);
+        }
+        .follow-info{
+            position: absolute;
+            bottom: 0px;
+            
+        }
+        .edit-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        /* friend */
+        .friend-card {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .friend-card img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .friend-name {
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .friend-list {
+            max-width: 400px;
+            margin: auto;
+        }
+
+        /* post */
+        .post-img img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .post-text {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">MySocial</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/message-page">Messages</a>
+                    </li>
+                    <!-- Notification Icon -->
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="toggleBulletinBoard()">
+                            <i class="bi bi-bell notification-icon"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Bulletin Board (Side Panel) -->
+    <div class="bulletin-board" id="bulletinBoard">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5>Bulletin Board</h5>
+            <!-- Hide Button -->
+            <button class="btn btn-sm btn-outline-secondary" onclick="toggleBulletinBoard()">Hide</button>
+        </div>
+        <ul class="list-unstyled mt-3">
+            <li><a href="#post1" onclick="toggleBulletinBoard()">User 1 commented on your post</a></li>
+            <li><a href="#post2" onclick="toggleBulletinBoard()">User 2 liked your photo</a></li>
+            <li><a href="#post3" onclick="toggleBulletinBoard()">User 3 mentioned you in a comment</a></li>
+        </ul>
+    </div>
+
+    <!-- Profile Header -->
+    <div class="profile-header container">
+        <!-- Cover Photo -->
+         <div class="cover-photo">
+            <img src="/app/static/Image/tải xuống.jpg" alt="Cover Photo" class="cover-photo">
+         </div>
+        
+        
+        <!-- Avatar -->
+         <div class="row">
+            <img src="/app/static/Image/logo.png" alt="Avatar" class="avatar">
+            
+        
+            <!-- Profile Info -->
+            <div class="profile-info">
+                <h5 class="mb-0">Ngọc Ánh Tú</h5>
+                <p class="mb-0">B-0012 - Nhân viên thiết kế - Khối đổi mới - Văn phòng MISA</p>
+            </div>
+            <div class="follow-info">
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-outline-primary">kết bạn</button>
+                    <button class="btn btn-outline-primary">follow</button>
+                    <button class="btn btn-outline-primary">Chặn</button>
+                </div>
+            </div>
+        </div>
+        
+        
+        <!-- Edit Button -->
+        <button class="edit-btn">
+            <i class="bi bi-pencil"></i>
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row">
+            <!-- Left Info -->
+            <div class="col-md-4">
+                <div class="card" style="margin-bottom: 30px">
+                    <div class="card-header bg-primary text-white">
+                        Thông tin chung
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Ngày sinh:</strong> 16/03/1996</li>
+                        <li class="list-group-item"><strong>Số điện thoại:</strong> 0984568785</li>
+                        <li class="list-group-item"><strong>Email:</strong> natu@gmail.com</li>
+                        <li class="list-group-item"><strong>Skype:</strong> tuvip</li>
+                        <li class="list-group-item"><strong>Facebook:</strong> <a href="https://facebook.com">https://www.facebook.com/...</a></li>
+                        <li class="list-group-item"><strong>Địa chỉ:</strong> Số 14, Ngõ 56 Lê Quang Đạo, Nam Từ Liêm, Hà Nội</li>
+                    </ul>
+                </div>
+                <div class="friend-list bg-white p-3 rounded shadow-sm">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0">Bạn bè</h6>
+                        <a href="#" class="text-primary text-decoration-none">Xem tất cả bạn bè</a>
+                    </div>
+                    <!-- Sub-header -->
+                    <p class="text-muted mb-3">753 người bạn</p>
+        
+                    <!-- Friend Grid -->
+                    <div class="row g-2">
+                        <!-- Friend Card Example -->
+                        <div class="col-4">
+                            <div class="friend-card">
+                                <img src="/app/static/Image/logo.png" alt="Trinh Thủy">
+                                <div class="friend-name">Trinh Thủy</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="friend-card">
+                                <img src="/app/static/Image/logo-name.png" alt="Nam Đặng">
+                                <div class="friend-name">Nam Đặng</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="friend-card">
+                                <img src="/app/static/Image/logo-name.png" alt="Hoàng Giang">
+                                <div class="friend-name">Hoàng Giang</div>
+                            </div>
+                        </div>
+                        <!-- Add more friends -->
+                        <div class="col-4">
+                            <div class="friend-card">
+                                <img src="/app/static/Image/logo-name.png" alt="Hà Thái Toàn">
+                                <div class="friend-name">Hà Thái Toàn</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="friend-card">
+                                <img src="/app/static/Image/logo-name.png" alt="Lê Bảo">
+                                <div class="friend-name">Lê Bảo</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="friend-card">
+                                <img src="/app/static/Image/logo-name.png" alt="Hào Nguyễn Nhựt">
+                                <div class="friend-name">Hào Nguyễn Nhựt</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="friend-card">
+                                <img src="/app/static/Image/logo-name.png" alt="Sùng Minh">
+                                <div class="friend-name">Sùng Minh</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="friend-card">
+                                <img src="/app/static/Image/logo.png" alt="Ngọc Huyền">
+                                <div class="friend-name">Ngọc Huyền</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="friend-card">
+                                <img src="/app/static/Image/logo-name.png" alt="Na Phan">
+                                <div class="friend-name">Na Phan</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Posts -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <!-- New Post Area -->
+                    <div class="new-post-area">
+                        <textarea class="new-post-textarea" rows="3" placeholder="What's on your mind?"></textarea>
+                        <div class="d-flex justify-content-between mt-2">
+                            <div>
+                                <label for="postImage" class="icon-picture">
+                                    <i class="bi bi-image"></i>
+                                </label>
+                                <input type="file" id="postImage" class="d-none">
+                            </div>
+                            <button class="btn btn-primary">Post</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- Header -->
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="https://via.placeholder.com/40" class="rounded-circle me-3" alt="Avatar">
+                                <div>
+                                    <h6 class="mb-0">Nguyễn Thảo Nguyên</h6>
+                                    <small class="text-muted">2 giờ trước</small>
+                                </div>
+                            </div>
+                            <!-- Content -->
+                            <p>Teambuilding với Misa những ngày cuối mùa thu thật là tuyệt vời và nhiều ý nghĩa. Chúc gia đình Misa ngày 1 lớn mạnh và trưởng thành vững chắc!</p>
+                            <!-- Images -->
+                            <div class="row post-img">
+                                <div class="col-md-4 mb-3">
+                                    <img src="/app/static/Image/logo-name.png" alt="Image 1">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <img src="/app/static/Image/logo-name.png" alt="Image 2">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <img src="/app/static/Image/logo-name.png" alt="Image 3">
+                                </div>
+                            </div>
+                            <!-- Footer -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <button class="btn btn-outline-primary btn-sm">Thích</button>
+                                    <button class="btn btn-outline-secondary btn-sm">Bình luận</button>
+                                    <button class="btn btn-outline-secondary btn-sm">Chia sẻ</button>
+                                </div>
+                                <small class="text-muted">24 lượt thích • 12 bình luận</small>
+                            </div>
+                            <!-- Comments -->
+                            <div class="post-text mt-4">
+                                <strong>Vũ Hoàng Bảo An:</strong> Cảnh đẹp quá!
+                                <br>
+                                <strong>Nguyễn Tường An:</strong> Tks bạn, chụp vui thôi 😅
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <script>
+        // Toggle bulletin board visibility
+        function toggleBulletinBoard() {
+            document.getElementById('bulletinBoard').classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
