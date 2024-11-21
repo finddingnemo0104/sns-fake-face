@@ -1,14 +1,16 @@
 from datetime import datetime
+from typing import List
 
+from flask_login import UserMixin
 from sqlalchemy import String, TEXT
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app import db
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'user'
 
-    userID: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(255), unique=True)
     password: Mapped[str] = mapped_column(String(255))
     name: Mapped[str] = mapped_column(String(255))
@@ -22,23 +24,6 @@ class User(db.Model):
     created_at: Mapped[datetime] = mapped_column()
     updated_at: Mapped[datetime] = mapped_column()
 
-
-def create_user():
-    user = User(
-        userID=1,
-        username="thuytrang",
-        password="123456",
-        name="Thuy Trang",
-        gender="Female",
-        avatar="",
-        cover="",
-        dob=datetime.now(),
-        biography="",
-        phone="0123456789",
-        email="thuytrangD@gmail.com",
-        created_at=datetime.now(),
-        updated_at=datetime.now(),)
-
-    db.session.add(user)
-    db.session.commit()
-
+    messages = relationship("Message", back_populates="sender", lazy=True)
+    chat_users = relationship("ChatUser", back_populates="user", lazy=True)
+    posts = relationship("Post", back_populates="User", lazy=True)

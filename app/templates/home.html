@@ -106,7 +106,10 @@
                         <a class="nav-link" href="#">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/message-page">Messages</a>
+                        <a class="nav-link" href="/chats">Chats</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
                     </li>
                     <!-- Notification Icon -->
                     <li class="nav-item">
@@ -150,10 +153,10 @@
 
             <!-- Main Content / News Feed -->
             <div class="col-md-6">
-                <div class="content">
+                <div  class="content">
                     <!-- New Post Area -->
-                    <div class="new-post-area">
-                        <textarea class="new-post-textarea" rows="3" placeholder="What's on your mind?"></textarea>
+                    <form id="create-post-form" action="/posts/create" method="post" class="new-post-area" enctype="multipart/form-data">
+                        <textarea name="content" class="new-post-textarea" rows="3" placeholder="What's on your mind?"></textarea>
                         <div class="d-flex justify-content-between mt-2">
                             <div>
                                 <label for="postImage" class="icon-picture">
@@ -163,36 +166,13 @@
                             </div>
                             <button class="btn btn-primary">Post</button>
                         </div>
-                    </div>
+                    </form>
 
                     <!-- Existing Posts -->
-                    <div class="post" id="post1">
-                        <p><strong>User 1</strong> Just had a great day!</p>
-                        <p>Lorem ipsum dolor sit amet...</p>
-                        <!-- Comment Section -->
-                        <div class="comment-section mt-3">
-                            <textarea class="form-control mb-2" rows="2" placeholder="Write a comment..."></textarea>
-                            <button class="btn btn-primary btn-sm">Comment</button>
-                        </div>
+                    <div id="posts-container">
+
                     </div>
-                    <div class="post" id="post2">
-                        <p><strong>User 2</strong> Shared a photo</p>
-                        <p>Lorem ipsum dolor sit amet...</p>
-                        <!-- Comment Section -->
-                        <div class="comment-section mt-3">
-                            <textarea class="form-control mb-2" rows="2" placeholder="Write a comment..."></textarea>
-                            <button class="btn btn-primary btn-sm">Comment</button>
-                        </div>
-                    </div>
-                    <div class="post" id="post3">
-                        <p><strong>User 3</strong> Mentioned you in a comment</p>
-                        <p>Lorem ipsum dolor sit amet...</p>
-                        <!-- Comment Section -->
-                        <div class="comment-section mt-3">
-                            <textarea class="form-control mb-2" rows="2" placeholder="Write a comment..."></textarea>
-                            <button class="btn btn-primary btn-sm">Comment</button>
-                        </div>
-                    </div>
+
                 </div>
             </div>
 
@@ -221,5 +201,6 @@
             document.getElementById('bulletinBoard').classList.toggle('active');
         }
     </script>
+    <script type="module" src="{{ url_for('static', filename='script/posts.js') }}"></script>
 </body>
 </html>

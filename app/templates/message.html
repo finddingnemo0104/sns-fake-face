@@ -1,239 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>FakeFace</title>
-    <link rel="icon" type="image/x-icon" href="/image/logo.png" />
+    <link rel="icon" type="image/x-icon" href="/image/logo.png"/>
     <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+            rel="stylesheet"
     />
     <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     />
     <style>
-      .message-container {
-        max-width: 100%; /* Allow messages to take full width */
-      }
-      .input-group {
-        width: 100%; /* Make input group full width */
-      }
-      .messages {
-        height: calc(100vh - 200px); /* Adjust height to fit the screen */
-        overflow-y: auto; /* Enable scrolling */
-      }
+        .message-container {
+            max-width: 100%; /* Allow messages to take full width */
+        }
+
+        .input-group {
+            width: 100%; /* Make input group full width */
+        }
+
+        .messages {
+            height: calc(100vh - 200px); /* Adjust height to fit the screen */
+            overflow-y: auto; /* Enable scrolling */
+        }
     </style>
-  </head>
-  <body>
-    <div class="container-fluid h-100">
-      <div class="row h-100">
+</head>
+<body>
+<div class="container-fluid vh-100">
+    <div class="row h-100">
         <!-- Sidebar for Contacts -->
-        <div class="col-md-3 col-12 bg-light border-right">
-          <h4 class="p-3">Đoạn chat</h4>
-          <ul class="list-group">
-            <li class="list-group-item d-flex align-items-center">
-              <img
-                src="https://via.placeholder.com/40"
-                alt="Alice"
-                class="rounded-circle mr-2"
-              />
-              <div>
-                <strong>Alice</strong>
-                <div class="text-muted">Hi there!</div>
-              </div>
-            </li>
-            <li class="list-group-item d-flex align-items-center">
-              <img
-                src="https://via.placeholder.com/40"
-                alt="Bob"
-                class="rounded-circle mr-2"
-              />
-              <div>
-                <strong>Bob</strong>
-                <div class="text-muted">Are we still on for tonight?</div>
-              </div>
-            </li>
-            <li class="list-group-item d-flex align-items-center">
-              <img
-                src="https://via.placeholder.com/40"
-                alt="Charlie"
-                class="rounded-circle mr-2"
-              />
-              <div>
-                <strong>Charlie</strong>
-                <div class="text-muted">See you later!</div>
-              </div>
-            </li>
-            <li class="list-group-item d-flex align-items-center">
-              <img
-                src="https://via.placeholder.com/40"
-                alt="David"
-                class="rounded-circle mr-2"
-              />
-              <div>
-                <strong>David</strong>
-                <div class="text-muted">Let’s catch up!</div>
-              </div>
-            </li>
-            <li class="list-group-item d-flex align-items-center">
-              <img
-                src="https://via.placeholder.com/40"
-                alt="Eve"
-                class="rounded-circle mr-2"
-              />
-              <div>
-                <strong>Eve</strong>
-                <div class="text-muted">
-                  What do you think about the project?
-                </div>
-              </div>
-            </li>
-          </ul>
+        <div id="chats-sidebar" class="col-md-3 col-12 bg-light border-right">
+            <h4 class="p-3">Đoạn chat</h4>
+            <ul class="list-group">
+                {% if current_user %}
+                    {% for chat in chats %}
+                        <li class="list-group-item d-flex align-items-center p-0">
+                            <button data-chat-id="{{ chat.chatID }}"
+                                    class="btn btn-light d-flex align-items-center w-100">
+                                <img
+                                        src="https://via.placeholder.com/40"
+                                        alt="Alice"
+                                        class="rounded-circle mr-2"
+                                />
+                                <div>
+                                    <strong>ChatID: {{ chat.chatID }}</strong>
+                                    <div class="text-muted">Hi there!</div>
+                                </div>
+                            </button>
+
+                        </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
         </div>
 
         <!-- Chat Window -->
-        <div class="col-md-6 col-12 d-flex flex-column">
-          <div class="chat-window flex-fill overflow-auto bg-white">
-            <div class="p-3 border-bottom">
-              <strong>Alice</strong>
-            </div>
-            <div class="messages flex-grow-1 overflow-auto p-3">
-              <div class="d-flex mb-2">
-                <div class="mr-2">
-                  <div class="bg-light p-2 rounded w-100">Hi there!</div>
-                </div>
-              </div>
-              <div class="d-flex justify-content-end mb-2">
-                <div>
-                  <div class="bg-primary text-white p-2 rounded w-100">
-                    Hello! How are you?
-                  </div>
-                </div>
-              </div>
-              <div class="d-flex mb-2">
-                <div class="mr-2">
-                  <div class="bg-light p-2 rounded w-100">
-                    I'm good, thanks! How about you?
-                  </div>
-                </div>
-              </div>
-              <div class="d-flex justify-content-end mb-2">
-                <div>
-                  <div class="bg-primary text-white p-2 rounded w-100">
-                    Doing well, just busy with work.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <!-- Input Area -->
-          <div class="input-group">
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Type a message..."
-              aria-label="Type a message"
-            />
-            <div class="input-group-append">
-              <button class="btn btn-primary" type="button">Gửi</button>
-            </div>
-          </div>
+        <div class="col-md-6 col-12 d-flex flex-column mb-4">
+            {% if chat_partner %}
+                <!-- Chat Header -->
+                <div class="chat-window flex-fill overflow-auto bg-white">
+                    <div class="p-3 border-bottom">
+                        <strong>{{ chat_partner.username }}</strong>
+                    </div>
+                    <div class="messages flex-grow-1 overflow-auto p-3" id="messages-container">
+                        {% if messages %}
+                            {% for message in messages %}
+                                {% if message.senderID == current_user.id %}
+                                    <div class="d-flex justify-content-end mb-2">
+                                        <div>
+                                            <div class="bg-primary text-white p-2 rounded w-100">
+                                                {{ message.content }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                {% else %}
+                                    <div class="d-flex mb-2">
+                                        <div class="mr-2">
+                                            <div class="bg-light p-2 rounded w-100">
+                                                {{ message.content }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <form class="input-group" id="send-message-form">
+                    <input type="hidden" name="userID" value="{{ current_user.id }}">
+                    <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Type a message..."
+                            aria-label="Type a message"
+                            name="message"
+                    />
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">Gửi</button>
+                    </div>
+                </form>
+            {% endif %}
         </div>
+
 
         <!-- Contact Info Panel -->
         <div class="col-md-3 col-12 bg-light border-left">
-          <div class="p-3 border-bottom text-center">
-            <img
-              src="https://via.placeholder.com/80"
-              alt="Alice"
-              class="rounded-circle mb-2"
-            />
-            <h5>Alice</h5>
-            <div class="row justify-content-between">
-              <div class="col-4">
-                <a href="#" class="btn btn-link"
-                  ><img
-                    src="/image/logo.png"
-                    alt="logo"
-                    style="width: 25px; height: auto"
-                /></a>
-                <div>Trang cá nhân</div>
-              </div>
-              <div class="text-center col-4">
-                <a href="#" class="btn btn-link">
-                  <i class="fa-solid fa-bell fa-2x" style="font-size: 22px"></i>
-                </a>
-                <div>Tắt thông báo</div>
-              </div>
-              <div class="col-4">
-                <a href="#" class="btn btn-link"
-                  ><i
-                    class="fa-solid fa-magnifying-glass"
-                    style="font-size: 22px"
-                  ></i
-                ></a>
-                <div>Tìm kiếm</div>
-              </div>
+            <div class="p-3 border-bottom text-center">
+                <img
+                        src="https://via.placeholder.com/80"
+                        alt="Alice"
+                        class="rounded-circle mb-2"
+                />
+                <h5>Alice</h5>
+                <div class="row justify-content-between">
+                    <div class="col-4">
+                        <a href="#" class="btn btn-link"
+                        ><img
+                                src="/image/logo.png"
+                                alt="logo"
+                                style="width: 25px; height: auto"
+                        /></a>
+                        <div>Trang cá nhân</div>
+                    </div>
+                    <div class="text-center col-4">
+                        <a href="#" class="btn btn-link">
+                            <i class="fa-solid fa-bell fa-2x" style="font-size: 22px"></i>
+                        </a>
+                        <div>Tắt thông báo</div>
+                    </div>
+                    <div class="col-4">
+                        <a href="#" class="btn btn-link"
+                        ><i
+                                class="fa-solid fa-magnifying-glass"
+                                style="font-size: 22px"
+                        ></i
+                        ></a>
+                        <div>Tìm kiếm</div>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="p-3 border-top">
-            <h6>Quản lý đoạn chat</h6>
-            <ul class="list-unstyled">
-              <li>
-                <button
-                  class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"
-                >
-                  <i class="fa-solid fa-palette pr-3"></i>
-                  Thay đổi màu chủ đề
-                </button>
-              </li>
-              <li>
-                <button
-                  class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"
-                >
-                  <i class="fa-solid fa-font pr-3"></i>
-                  Thay đổi biệt danh
-                </button>
-              </li>
-              <li>
-                <button
-                  class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"
-                >
-                  <i class="fa-solid fa-images pr-3"></i>
-                  File phương tiện và file
-                </button>
-              </li>
-              <li>
-                <button
-                  class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"
-                >
-                  <i class="fa-solid fa-shield-halved pr-3"></i>
-                  Quyền riêng tư và hỗ trợ
-                </button>
-              </li>
-              <li>
-                <button
-                  class="btn btn-block border-0 d-flex align-items-center text-danger bold"
-                >
-                  <i class="fa-solid fa-ban pr-3 text-danger"></i>
-                  Chặn
-                </button>
-              </li>
-            </ul>
-          </div>
+            <div class="p-3 border-top">
+                <h6>Quản lý đoạn chat</h6>
+                <ul class="list-unstyled">
+                    <li>
+                        <button
+                                class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"
+                        >
+                            <i class="fa-solid fa-palette pr-3"></i>
+                            Thay đổi màu chủ đề
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                                class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"
+                        >
+                            <i class="fa-solid fa-font pr-3"></i>
+                            Thay đổi biệt danh
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                                class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"
+                        >
+                            <i class="fa-solid fa-images pr-3"></i>
+                            File phương tiện và file
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                                class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"
+                        >
+                            <i class="fa-solid fa-shield-halved pr-3"></i>
+                            Quyền riêng tư và hỗ trợ
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                                class="btn btn-block border-0 d-flex align-items-center text-danger bold"
+                        >
+                            <i class="fa-solid fa-ban pr-3 text-danger"></i>
+                            Chặn
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </div>
-      </div>
     </div>
+</div>
 
-    <script
-      src="https://kit.fontawesome.com/793699135f.js"
-      crossorigin="anonymous"
-    ></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  </body>
+<script
+        src="https://kit.fontawesome.com/793699135f.js"
+        crossorigin="anonymous"
+></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script type="importmap">
+    {
+      "imports": {
+        "socket.io-client": "https://cdn.socket.io/4.8.0/socket.io.esm.min.js"
+      }
+    }
+</script>
+<script type="module" src="{{ url_for('static', filename='script/messages.js') }}"></script>
+</body>
 </html>
