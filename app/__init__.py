@@ -9,7 +9,8 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:khongrotmon@localhost:3306/sns_fake_face"
     db.init_app(app)
 
-    from .routes import main_bp
+    from .routes import main_bp, authentication_bp
     app.register_blueprint(main_bp)
+    app.register_blueprint(authentication_bp)
 
     return app
