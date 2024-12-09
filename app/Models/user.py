@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 
 from flask_login import UserMixin
 from sqlalchemy import String, TEXT

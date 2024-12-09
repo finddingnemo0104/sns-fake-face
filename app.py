@@ -1,8 +1,5 @@
-from datetime import datetime
-
-from app import create_app, db, socketio
+from app import create_app, socketio
 app = create_app()
-
 
 
 if __name__ == '__main__':

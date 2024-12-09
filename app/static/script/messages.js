@@ -1,5 +1,4 @@
 import {io} from "socket.io-client";
-import {MessageElement} from "./web-components/message-element.js";
 
 const socket = io();
 

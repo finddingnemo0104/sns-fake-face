@@ -25,13 +25,13 @@
             </div>
 
     <!-- Right Box -->
-            <div class="col-md-6 right-box">
+            <form action="/login" method="post" class="col-md-6 right-box">
                 <dic class="row align-items-center">
                     <div class="input-group mp-3">
-                        <input type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Email address">
+                        <input name="username" type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Email address">
                     </div>
                     <div class="input-group mp-1">
-                        <input type="password" class="form-control form-control-lg bg-light fs-6" placeholder="password">
+                        <input name="password" type="password" class="form-control form-control-lg bg-light fs-6" placeholder="password">
                     </div>
                     <div class="input-group mp-3">
                         <button type="submit" class="btn btn-lg btn-primary w-100 fs-6">Đăng Nhập</button>
@@ -48,7 +48,7 @@
                         </a>
                     </div>
                 </dic>
-            </div>
+            </form>
 
         </div>
     </div>

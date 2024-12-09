@@ -15,7 +15,6 @@ login_manager = LoginManager()
 
 def create_app():
     from app.routes.socketio import socketio_events
-    from werkzeug.utils import secure_filename
 
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:khongrotmon@localhost:3306/sns_fake_face"

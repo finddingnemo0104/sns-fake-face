@@ -16,7 +16,6 @@ def load_user(user_id):
 
 
 @main_bp.route('/')
-@login_required
 def home():  # put application's code here
     if current_user.is_authenticated:
         return redirect(url_for('main.home_page'))
@@ -25,7 +24,6 @@ def home():  # put application's code here
 
 
 @main_bp.route('/chats')
-@login_required
 def message_page():
     if not current_user.is_authenticated:
         return render_template('login.html')
