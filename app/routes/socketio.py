@@ -31,6 +31,8 @@ def socketio_events(socketio):
         message = Message(chatID=chatID, senderID=current_user.id, content=messageContent, created_at=datetime.now())
         message.save()
 
+        jsonData['createAt'] = message.created_at.strftime('%Y-%m-%d %H:%M:%S')
+
         print(f'User {current_user.username} sent message: ')
 
         emit('message', jsonData, to=chatID, broadcast=True, include_self=True)
@@ -43,7 +45,7 @@ def socketio_events(socketio):
         userID = int(jsonData['userID'])
         room = int(jsonData['chatID'])
         join_room(room)
-        emit("join", f'UserID: {userID} joined room: ' + room, to=room)
+        emit("join", f'UserID: {userID} joined room', to=room)
 
     @socketio.on('leave')
     def on_leave(data):

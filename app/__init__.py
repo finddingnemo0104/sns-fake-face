@@ -30,36 +30,28 @@ def create_app():
     from app.Models.chat_user import ChatUser
     from app.Models.chat import Chat
     from app.Models.post import Post
+    from app.Models.friendship import Friendship
+    from app.Models.comment import Comment
+    from app.Models.like import Like
 
     with app.app_context():
         db.create_all()
 
         # if chat is empty, create a new chat
-        if not db.session.execute(db.select(User)).scalar():
-            user_1 = User(username="thuyTrang", password="123456", name="Thuy Trang", gender="Female", avatar=None, cover=None, dob=datetime(1990, 1, 1), biography=None, phone="1234567890", email="user1@example.com", created_at=datetime.now(), updated_at=datetime.now())
-            user_2 = User(username="trangThuy", password="123456", name="Trang Thuy", gender="Female", avatar=None, cover=None, dob=datetime(1990, 1, 1), biography=None, phone="1234567890", email="user1@example.com", created_at=datetime.now(), updated_at=datetime.now())
-            db.session.add(user_1)
-            db.session.add(user_2)
-            db.session.commit()
+        from app.default_data import add_default_data
+        add_default_data()
 
-            chat = Chat(created_at=datetime.now())
-            db.session.add(chat)
-            db.session.commit()
-
-            chat_user_1 = ChatUser(chatID=chat.chatID, userID=1)
-            chat_user_2 = ChatUser(chatID=chat.chatID, userID=2)
-            db.session.add(chat_user_1)
-            db.session.add(chat_user_2)
-            db.session.commit()
-
-            message = Message(chatID=chat.chatID, senderID=1, content="Hello", created_at=datetime.now())
-            db.session.add(message)
-            db.session.commit()
 
     from app.routes.main import main_bp
     from app.routes.auth import authentication_bp
     from app.routes.post import post_bp
+    from app.routes.user import user_bp
+    from app.routes.comment import comment_bp
+    from app.routes.chats import chats_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(authentication_bp)
     app.register_blueprint(post_bp)
+    app.register_blueprint(user_bp)
+    app.register_blueprint(comment_bp)
+    app.register_blueprint(chats_bp)
     return app

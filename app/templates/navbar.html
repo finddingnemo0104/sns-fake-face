@@ -1,0 +1,64 @@
+<nav class="navbar navbar-expand-md navbar-dark" aria-label="Fourth navbar example">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">FakeFace</a>
+        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="navbar-collapse collapse" id="navbarsExample04" style="">
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+
+                <li class="nav-item dropdown d-flex align-items-center me-2 ">
+                    <div class=dropdown">
+                        <a href="#"
+                           class="h-100 d-flex text-white align-items-center link-body-emphasis text-decoration-none dropdown-toggle"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="d-flex">
+                                <div class="me-2">{{ current_user.name }}</div>
+
+                                <img src='{{ current_user.avatar }}' alt="Avatar" width="32" height="32"
+                                     class="rounded-circle">
+                            </div>
+
+                        </a>
+                        <ul class="dropdown-menu text-small shadow dropdown-menu-md-end" style="">
+                            <li><a class="dropdown-item" href="/profile/{{ current_user.id }}">Trang cá nhân</a></li>
+                            <li><a id="delete-account-button"
+                                   class="dropdown-item">Xóa tài khoản</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/chats">
+                        <i class="bi bi-chat-heart fs-4"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="toggleBulletinBoard()">
+                        <i class="bi bi-bell notification-icon fs-4"></i>
+                    </a>
+                </li>
+
+            </ul>
+
+
+        </div>
+    </div>
+</nav>
+
+<script>
+    const deleteAccountButton = document.getElementById("delete-account-button");
+    deleteAccountButton.addEventListener('click', async () => {
+        if (confirm('Bạn có chắc chắn muốn xóa tài khoản không?')) {
+            window.location.href = '/users/delete/{{ current_user.id }}'
+        } else {
+
+        }
+    })
+</script>

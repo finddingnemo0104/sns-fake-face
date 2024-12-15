@@ -1,4 +1,5 @@
 import {io} from "socket.io-client";
+import './web-components/message-element.js';
 
 const socket = io();
 
@@ -55,6 +56,7 @@ if (chatID) {
         const messageEle = document.createElement('message-element');
         messageEle.message = data.message;
         messageEle.isSender = data.userID === currentUser.userID;
+        messageEle.createAt = data.createAt;
         messagesContainer.appendChild(messageEle);
         // scroll to the bottom of the messages container
         requestAnimationFrame(() => {

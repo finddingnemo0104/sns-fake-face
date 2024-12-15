@@ -1,5 +1,6 @@
 import {LitElement, html, render} from '../lib/lit-core.min.js';
 import {togglePostButton} from "../posts.js";
+import './comment-element.js';
 
 export class PostElement extends LitElement {
     static properties() {
@@ -8,13 +9,25 @@ export class PostElement extends LitElement {
             user: {
                 type: {
                     id: {type: Number},
-                    name: {type: String}
+                    name: {type: String},
+                    avatar: {type: String}
                 }
             },
             content: {type: String},
             image: {type: String},
             createdAt: {type: Date},
+            comments: {type: Array},
+            totalLikes: {type: Number},
+            liked: {type: Boolean},
+            totalComments: {type: Number},
+            isOwner: {type: Boolean}
         };
+    }
+
+    constructor() {
+        super();
+        this.comments = [];
+        this.liked = false;
     }
 
     deletePost(postID) {
@@ -40,7 +53,7 @@ export class PostElement extends LitElement {
         const previewImageUpdate = document.querySelector("#previewImageUpdate");
         textPost.value = data.content;
 
-        if (data.image !=="") {
+        if (data.image !== "") {
             previewImageUpdate.src = data.image;
             document.querySelector("#preview-image-container-update").style.display = "block";
         }
@@ -91,40 +104,97 @@ export class PostElement extends LitElement {
         });
     };
 
+    async sendComment(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        formData.append('postID', this.postID);
+        const response = await fetch("/comments/create", {
+            method: "POST",
+            body: formData,
+        });
+        if (response.ok) {
+            const commentData = await response.json();
+
+            this.comments = [...this.comments, {
+                ...commentData,
+                createAt: new Date(commentData.create_at),
+                updateAt: new Date(commentData.update_at),
+                isOwner: true
+            }]
+            this.totalComments = commentData.totalComments;
+            this.requestUpdate();
+            form.reset()
+        }
+    }
+
+    renderComment(comment) {
+        return html`
+            <comment-element
+                    .commentID=${comment.commentID}
+                    .content=${comment.content}
+                    .user=${comment.user}
+                    .postID=${comment.postID}
+                    .createAt=${comment.createAt}
+                    .updateAt=${comment.updateAt}
+                    .isOwner=${comment.isOwner}
+]            ></comment-element>
+        `
+    }
+
+    renderComments() {
+        if (window.location.href.includes("/detail")) {
+            return this.comments.slice(0, 10).map((comment, index) => this.renderComment(comment))
+        }
+        return this.comments.slice(0, 2).map((comment, index) => this.renderComment(comment))
+    }
+
+    async handleLike() {
+        const response = await fetch(`/posts/like/${this.postID}`);
+        const data = await response.json();
+        this.totalLikes = data.totalLikes;
+        this.liked = data.liked;
+        this.requestUpdate();
+    }
+
 
     render() {
         return html`
             <div class="post">
                 <div class="d-flex align-items-center mb-2">
-                    <img src="https://via.placeholder.com/40" class="rounded-circle" alt="User Image">
+                    <img src="${this.user.avatar}" width="32" height="32" class="rounded-circle" alt="User Image">
                     <div class="ms-2 m-0">
-                        <div class="fw-bold">${this.user.name}</div>
+                        <a href="/profile/${this.user.id}" class="fw-bold text-decoration-none">${this.user.name}</a>
                         <div class="text-secondary">${this.createdAt.toLocaleDateString()} at
                             ${this.createdAt.toLocaleTimeString()}
                         </div>
                     </div>
 
-                    <div class="dropdown ms-auto">
-                        <i class="bi bi-three-dots ms-auto post-management" role="button" data-bs-toggle="dropdown"
-                           aria-expanded="false"></i>
+                    ${this.isOwner ? (
+                            html`
+                                <div class="dropdown ms-auto">
+                                    <i class="bi bi-three-dots ms-auto post-management" role="button"
+                                       data-bs-toggle="dropdown"
+                                       aria-expanded="false"></i>
 
-                        <ul class="dropdown-menu dropdown-menu-lg-end">
-                            <li>
-                                <button @click=${() => this.updatePost(this.postID)}
-                                        class="dropdown-item update-post" data-bs-toggle="modal"
-                                        data-bs-target="#update-post-modal">Chỉnh sửa bài viết
-                                </button>
-                            </li>
-                            <li>
-                                <button @click=${() => this.deletePost(this.postID)}
-                                        class="dropdown-item delete-post"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#confirm-delete-modal">Xóa
-                                    bài viết
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
+                                    <ul class="dropdown-menu dropdown-menu-lg-end">
+                                        <li>
+                                            <button @click=${() => this.updatePost(this.postID)}
+                                                    class="dropdown-item update-post" data-bs-toggle="modal"
+                                                    data-bs-target="#update-post-modal">Chỉnh sửa bài viết
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button @click=${() => this.deletePost(this.postID)}
+                                                    class="dropdown-item delete-post"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#confirm-delete-modal">Xóa
+                                                bài viết
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>`
+                    ) : ""}
                 </div>
 
                 <p>${this.content}</p>
@@ -134,11 +204,51 @@ export class PostElement extends LitElement {
                                                alt="Post Image">` : ''
                 }
 
+                <div class="w-100">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <i class="bi bi-hand-thumbs-up-fill me-2 text-primary"></i>
+                            ${this.totalLikes}
+                        </div>
+                        <div>
+                            ${this.totalComments} bình luận
+                        </div>
+                    </div>
+                    <div class="row border-top">
+                        <button @click=${this.handleLike}
+                                class="col-4 btn btn-light ${this.liked === true && 'text-primary'}">
+                            <i class="bi bi-hand-thumbs-up-fill me-1"></i>
+                            Thích
+                        </button>
+                        <a href="/posts/detail/${this.postID}" class="col-4 btn btn-light">
+                            <i class="bi bi-chat me-1"></i>
+                            Bình luận
+                        </a>
+                        <a class="col-4 btn btn-light"
+                           type="button"
+                           href="javascript:"
+                           data-bs-toggle="modal"
+                           data-bs-target="#copiedModal"
+                           data-action="copy-link"
+                           data-link="/posts/detail/${this.postID}">
+                            <i class="fa-solid fa-link fa-xl text-dark text-decoration-none"></i>
+                            Chia sẻ
+                        </a>
+                    </div>
+
+                </div>
+
                 <!-- Comment Section -->
                 <div class="comment-section mt-3">
-                    <textarea class="form-control mb-2" rows="2" placeholder="Write a comment..."
-                              style="resize: none"></textarea>
-                    <button class="btn btn-primary btn-sm">Comment</button>
+                    ${this.renderComments()}
+
+                    <form @submit=${this.sendComment}>
+                        <textarea name="content" class="form-control mb-2" rows="2"
+                                  placeholder="Hãy chia sẻ ý kiến của bạn . . ."
+                                  style="resize: none" required></textarea>
+                        <button class="btn btn-primary btn-sm">Bình luận</button>
+                    </form>
+
                 </div>
             </div>`;
     }

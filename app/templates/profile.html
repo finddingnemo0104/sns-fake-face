@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/style/profile.css"/>
+{% endblock %}
+
+{% block navbar %}
+    {% include "navbar.html" %}
+{% endblock %}
+
+{% block content %}
+    <!-- Bulletin Board (Side Panel) -->
+    <div class="bulletin-board" id="bulletinBoard">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5>Bulletin Board</h5>
+            <!-- Hide Button -->
+            <button class="btn btn-sm btn-outline-secondary" onclick="toggleBulletinBoard()">Hide</button>
+        </div>
+        <ul class="list-unstyled mt-3">
+            <li><a href="#post1" onclick="toggleBulletinBoard()">User 1 commented on your post</a></li>
+            <li><a href="#post2" onclick="toggleBulletinBoard()">User 2 liked your photo</a></li>
+            <li><a href="#post3" onclick="toggleBulletinBoard()">User 3 mentioned you in a comment</a></li>
+        </ul>
+    </div>
+
+    <!-- Profile Header -->
+    <div class="profile-header container">
+        <!-- Cover Photo -->
+        <div class="cover-photo">
+            <img class="cover-photo">
+        </div>
+
+
+        <!-- Avatar -->
+        <div class="row">
+            <div>
+                <img src='{{ user.avatar }}' alt="Avatar" class="avatar">
+            </div>
+
+
+            <!-- Profile Info -->
+            <div class="profile-info">
+                <h5 class="mb-0">{{ user.name }}</h5>
+                {% if user.biography %}
+                    <p class="mb-0">{{ user.biography }}</p>
+                {% endif %}
+            </div>
+            {% if current_user.id != user.id %}
+                <div class="follow-info">
+                    <div class="d-flex justify-content-end">
+                        {% if friendshipButtonText == "Kết bạn" %}
+                            <button class="btn btn-outline-primary" id="send-friend-request">
+                                {{ friendshipButtonText }}
+                            </button>
+                        {% elif friendshipButtonText == "Bạn bè" %}
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{ friendshipButtonText }}
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/friend-request/{{ user.id }}/reject">Hủy kết
+                                        bạn</a></li>
+                                </ul>
+                            </div>
+                        {% elif friendshipButtonText == 'Chấp nhận' %}
+                            <a href="/friend-request/{{ user.id }}/accept" class="btn btn-outline-primary">
+                                {{ friendshipButtonText }}
+                            </a>
+                            <a href="/friend-request/{{ user.id }}/reject" class="btn btn-outline-primary"
+                               id="reject-friend-request">
+                                Từ chối
+                            </a>
+                        {% elif friendshipButtonText == "Hủy lời mời" %}
+                            <a href="/friend-request/{{ user.id }}/reject" class="btn btn-outline-primary"
+                               id="reject-friend-request">
+                                Hủy lời mời
+                            </a>
+                        {% endif %}
+                        <button class="btn btn-outline-primary"><a class="text-decoration-none"
+                                                                   href="/chats/create/{{ user.id }}">Nhắn
+                            tin</a></button>
+                        <button class="btn btn-outline-primary">Chặn</button>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+
+        <!-- Edit Button -->
+        <button class="edit-btn">
+            <i class="bi bi-pencil"></i>
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row">
+            <!-- Left Info -->
+            <div class="col-md-4">
+                {% if current_user.id == user.id %}
+                    <div class="card" style="margin-bottom: 30px">
+                        <div class="accordion" id="accordionExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseOne" aria-expanded="true"
+                                            aria-controls="collapseOne">
+                                        Thông tin cá nhân
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse show"
+                                     data-bs-parent="#accordionExample">
+                                    <form class="accordion-body" action="/users/update/{{ user.id }}" method="post">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item"><strong>Ngày sinh:</strong> {{ user.dob }}</li>
+                                            <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
+                                            <li class="list-group-item"><strong>Giới tính:</strong> {{ user.gender }}
+                                            </li>
+                                            <button type="button" class=" btn btn-primary" id="edit-user-button">
+                                                Sửa
+                                            </button>
+                                        </ul>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="friend-list bg-white p-3 rounded shadow-sm">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0">Bạn bè</h6>
+                        <a href="/profile/{{ user.id }}/friends" class="text-primary text-decoration-none">Xem tất cả
+                            bạn bè</a>
+                    </div>
+                    <!-- Sub-header -->
+                    <p class="text-muted mb-3">{{ totalFriends }} người bạn</p>
+
+                    <!-- Friend Grid -->
+                    <div class="row g-2">
+                        {% if profileFriends %}
+                            {% for friend in profileFriends %}
+                                <!-- Friend Card -->
+                                <div class="col-4">
+                                    <a href="/profile/{{ friend.id }}" class="text-decoration-none">
+                                        <div class="friend-card">
+                                            <img src="{{ friend.avatar }}" alt="{{ friend.name }}">
+                                            <div class="friend-name">{{ friend.name }}</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Posts -->
+            <div class="col-md-8">
+                <div class="mb-4 ">
+                    <!-- New Post Area -->
+                    <form id="create-post-form" action="/posts/create" method="post" class="new-post-area"
+                          enctype="multipart/form-data">
+                    <textarea name="content" class="new-post-textarea" rows="3" id="new-post-textarea"
+                              placeholder="Hãy chia sẻ cảm xúc của bạn"></textarea>
+                        <input type="file" id="postImage" class="d-none">
+                        <div style="position: relative; display: none" id="preview-image-container">
+                            <img id="previewImage" alt="Image Preview"
+                                 style="width: 100%; height: auto; margin-top: 10px;">
+                            <i class="bi bi-x-circle-fill ms-auto remove-image-post"></i>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <div>
+                                <label for="postImage" class="icon-picture">
+                                    <i class="bi bi-image"></i>
+                                </label>
+                            </div>
+                            <button class="btn btn-primary" id="post-button" disabled>Đăng</button>
+                        </div>
+                    </form>
+
+                    <!-- Existing Posts -->
+                    <div id="posts-container">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "delete-post-modal.html" %}
+    {% include "update-post-modal.html" %}
+
+
+    <script>
+        const currentUserID = {{ current_user.id }};
+        const profileUserID = {{ user.id }};
+
+        // Toggle bulletin board visibility
+        function toggleBulletinBoard() {
+            document.getElementById('bulletinBoard').classList.toggle('active');
+        }
+    </script>
+    <script src="/static/script/profile.js"></script>
+    <script type="module" src="{{ url_for('static', filename='script/posts.js') }}"></script>
+{% endblock %}

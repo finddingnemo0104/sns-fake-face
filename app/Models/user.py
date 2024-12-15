@@ -18,11 +18,18 @@ class User(UserMixin, db.Model):
     cover: Mapped[str] = mapped_column(String(255), nullable=True)
     dob: Mapped[datetime] = mapped_column()
     biography: Mapped[str] = mapped_column(TEXT, nullable=True)
-    phone: Mapped[str] = mapped_column(String(255))
     email: Mapped[str] = mapped_column(String(255))
     created_at: Mapped[datetime] = mapped_column()
     updated_at: Mapped[datetime] = mapped_column()
 
-    messages = relationship("Message", back_populates="sender", lazy=True)
-    chat_users = relationship("ChatUser", back_populates="user", lazy=True)
-    posts = relationship("Post", back_populates="User", lazy=True)
+    messages = relationship("Message", back_populates="sender", lazy=True, cascade="all, delete-orphan")
+    likes = relationship("Like", back_populates="user", lazy=True, cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="user", lazy=True, cascade="all, delete-orphan")
+    chat_users = relationship("ChatUser", back_populates="user", lazy=True, cascade="all, delete-orphan")
+    posts = relationship("Post", back_populates="User", lazy=True, cascade="all, delete-orphan")
+    friendships_as_user = relationship(
+        "Friendship", foreign_keys="[Friendship.userId]", back_populates="user", lazy=True, cascade="all, delete-orphan"
+    )
+    friendships_as_friend = relationship(
+        "Friendship", foreign_keys="[Friendship.friendId]", back_populates="friend", lazy=True, cascade="all, delete-orphan"
+    )

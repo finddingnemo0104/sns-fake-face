@@ -1,0 +1,33 @@
+    {# Update post modal #}
+    <div class="modal" tabindex="-1" id="update-post-modal">
+        <div class="modal-dialog" style="max-width: 600px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chỉnh sửa bài viết</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="update-post-form" action="/posts/update" method="patch" class="new-post-area"
+                      enctype="multipart/form-data">
+                    <textarea name="content" class="new-post-textarea" rows="3" id="updated-post-textarea"
+                    ></textarea>
+                    <input type="file" id="postImageUpdate" class="d-none">
+                    <div style="position: relative; display: none" id="preview-image-container-update">
+                        <img id="previewImageUpdate" alt="Image Preview"
+                             style="width: 100%; height: auto; margin-top: 10px;">
+                        <i class="bi bi-x-circle-fill ms-auto remove-image-post" id="remove-image-post-update"></i>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <div>
+                            <label for="postImageUpdate" class="icon-picture">
+                                <i class="bi bi-image"></i>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="update-post-button">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -33,21 +33,27 @@
     <div class="row h-100">
         <!-- Sidebar for Contacts -->
         <div id="chats-sidebar" class="col-md-3 col-12 bg-light border-right">
-            <h4 class="p-3">Đoạn chat</h4>
+            <div class="d-flex align-items-center">
+                <a href="/">
+                    <img src="/static/image/logo.png" width="32" height="32"/>
+                </a>
+                <h4 class="p-3">Đoạn chat</h4>
+            </div>
             <ul class="list-group">
                 {% if current_user %}
                     {% for chat in chats %}
                         <li class="list-group-item d-flex align-items-center p-0">
-                            <button data-chat-id="{{ chat.chatID }}"
+                            <button data-chat-id="{{ chat.chat.chatID }}"
                                     class="btn btn-light d-flex align-items-center w-100">
                                 <img
-                                        src="https://via.placeholder.com/40"
+                                        src="{{ chat.partner.avatar }}"
                                         alt="Alice"
                                         class="rounded-circle mr-2"
+                                        width="32"
+                                        height="32"
                                 />
                                 <div>
-                                    <strong>ChatID: {{ chat.chatID }}</strong>
-                                    <div class="text-muted">Hi there!</div>
+                                    <strong>{{ chat.partner.name }}</strong>
                                 </div>
                             </button>
 
@@ -64,25 +70,40 @@
                 <!-- Chat Header -->
                 <div class="chat-window flex-fill overflow-auto bg-white">
                     <div class="p-3 border-bottom">
-                        <strong>{{ chat_partner.username }}</strong>
+                        <a class="d-flex align-items-center" href="/profile/{{ chat_partner.id }}">
+                            <img
+                                    src="{{ chat_partner.avatar }}"
+                                    alt="{{ chat_partner.name }}"
+                                    class="rounded-circle mr-2"
+                                    width="32"
+                                    height="32"
+                            />
+                            <strong>{{ chat_partner.name }}</strong>
+                        </a>
                     </div>
                     <div class="messages flex-grow-1 overflow-auto p-3" id="messages-container">
                         {% if messages %}
                             {% for message in messages %}
                                 {% if message.senderID == current_user.id %}
                                     <div class="d-flex justify-content-end mb-2">
-                                        <div>
+                                        <div class="d-flex flex-column">
                                             <div class="bg-primary text-white p-2 rounded w-100">
                                                 {{ message.content }}
+                                            </div>
+                                            <div>
+                                                {{ message.created_at }}
                                             </div>
                                         </div>
                                     </div>
 
                                 {% else %}
                                     <div class="d-flex mb-2">
-                                        <div class="mr-2">
+                                        <div class="d-flex flex-column mr-2">
                                             <div class="bg-light p-2 rounded w-100">
                                                 {{ message.content }}
+                                            </div>
+                                            <div>
+                                                {{ message.created_at }}
                                             </div>
                                         </div>
                                     </div>
@@ -101,6 +122,7 @@
                             placeholder="Type a message..."
                             aria-label="Type a message"
                             name="message"
+                            required
                     />
                     <div class="input-group-append">
                         <button class="btn btn-primary" type="submit">Gửi</button>
@@ -119,78 +141,78 @@
                         class="rounded-circle mb-2"
                 />
                 <h5>Alice</h5>
-                <div class="row justify-content-between">
-                    <div class="col-4">
-                        <a href="#" class="btn btn-link"
-                        ><img
-                                src="/image/logo.png"
-                                alt="logo"
-                                style="width: 25px; height: auto"
-                        /></a>
-                        <div>Trang cá nhân</div>
-                    </div>
-                    <div class="text-center col-4">
-                        <a href="#" class="btn btn-link">
-                            <i class="fa-solid fa-bell fa-2x" style="font-size: 22px"></i>
-                        </a>
-                        <div>Tắt thông báo</div>
-                    </div>
-                    <div class="col-4">
-                        <a href="#" class="btn btn-link"
-                        ><i
-                                class="fa-solid fa-magnifying-glass"
-                                style="font-size: 22px"
-                        ></i
-                        ></a>
-                        <div>Tìm kiếm</div>
-                    </div>
-                </div>
+                {#                <div class="row justify-content-between">#}
+                {#                    <div class="col-4">#}
+                {#                        <a href="#" class="btn btn-link"#}
+                {#                        ><img#}
+                {#                                src="/image/logo.png"#}
+                {#                                alt="logo"#}
+                {#                                style="width: 25px; height: auto"#}
+                {#                        /></a>#}
+                {#                        <div>Trang cá nhân</div>#}
+                {#                    </div>#}
+                {#                    <div class="text-center col-4">#}
+                {#                        <a href="#" class="btn btn-link">#}
+                {#                            <i class="fa-solid fa-bell fa-2x" style="font-size: 22px"></i>#}
+                {#                        </a>#}
+                {#                        <div>Tắt thông báo</div>#}
+                {#                    </div>#}
+                {#                    <div class="col-4">#}
+                {#                        <a href="#" class="btn btn-link"#}
+                {#                        ><i#}
+                {#                                class="fa-solid fa-magnifying-glass"#}
+                {#                                style="font-size: 22px"#}
+                {#                        ></i#}
+                {#                        ></a>#}
+                {#                        <div>Tìm kiếm</div>#}
+                {#                    </div>#}
+                {#                </div>#}
             </div>
-            <div class="p-3 border-top">
-                <h6>Quản lý đoạn chat</h6>
-                <ul class="list-unstyled">
-                    <li>
-                        <button
-                                class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"
-                        >
-                            <i class="fa-solid fa-palette pr-3"></i>
-                            Thay đổi màu chủ đề
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                                class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"
-                        >
-                            <i class="fa-solid fa-font pr-3"></i>
-                            Thay đổi biệt danh
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                                class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"
-                        >
-                            <i class="fa-solid fa-images pr-3"></i>
-                            File phương tiện và file
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                                class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"
-                        >
-                            <i class="fa-solid fa-shield-halved pr-3"></i>
-                            Quyền riêng tư và hỗ trợ
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                                class="btn btn-block border-0 d-flex align-items-center text-danger bold"
-                        >
-                            <i class="fa-solid fa-ban pr-3 text-danger"></i>
-                            Chặn
-                        </button>
-                    </li>
-                </ul>
-            </div>
+            {#            <div class="p-3 border-top">#}
+            {#                <h6>Quản lý đoạn chat</h6>#}
+            {#                <ul class="list-unstyled">#}
+            {#                    <li>#}
+            {#                        <button#}
+            {#                                class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"#}
+            {#                        >#}
+            {#                            <i class="fa-solid fa-palette pr-3"></i>#}
+            {#                            Thay đổi màu chủ đề#}
+            {#                        </button>#}
+            {#                    </li>#}
+            {#                    <li>#}
+            {#                        <button#}
+            {#                                class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"#}
+            {#                        >#}
+            {#                            <i class="fa-solid fa-font pr-3"></i>#}
+            {#                            Thay đổi biệt danh#}
+            {#                        </button>#}
+            {#                    </li>#}
+            {#                    <li>#}
+            {#                        <button#}
+            {#                                class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"#}
+            {#                        >#}
+            {#                            <i class="fa-solid fa-images pr-3"></i>#}
+            {#                            File phương tiện và file#}
+            {#                        </button>#}
+            {#                    </li>#}
+            {#                    <li>#}
+            {#                        <button#}
+            {#                                class="btn btn-outline-secondary btn-block mb-2 border-0 d-flex align-items-center"#}
+            {#                        >#}
+            {#                            <i class="fa-solid fa-shield-halved pr-3"></i>#}
+            {#                            Quyền riêng tư và hỗ trợ#}
+            {#                        </button>#}
+            {#                    </li>#}
+            {#                    <li>#}
+            {#                        <button#}
+            {#                                class="btn btn-block border-0 d-flex align-items-center text-danger bold"#}
+            {#                        >#}
+            {#                            <i class="fa-solid fa-ban pr-3 text-danger"></i>#}
+            {#                            Chặn#}
+            {#                        </button>#}
+            {#                    </li>#}
+            {#                </ul>#}
+            {#            </div>#}
         </div>
     </div>
 </div>

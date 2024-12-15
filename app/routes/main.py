@@ -1,11 +1,14 @@
-from flask import Blueprint, render_template, request, redirect, url_for, send_from_directory, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, send_from_directory, current_app, jsonify
 from flask_login import  login_required
 
 from app import db, login_manager
 from app.Models.chat import Chat
 from app.Models.chat_user import ChatUser
+from app.Models.friendship import Friendship
 from app.Models.user import User
 from flask_login import current_user
+
+from app.routes.user import get_friendship_json
 
 main_bp = Blueprint('main', __name__)
 
@@ -16,38 +19,16 @@ def load_user(user_id):
 
 
 @main_bp.route('/')
-def home():  # put application's code here
-    if current_user.is_authenticated:
-        return redirect(url_for('main.home_page'))
-
-    return redirect(url_for('authentication.login_page'))
-
-
-@main_bp.route('/chats')
-def message_page():
-    if not current_user.is_authenticated:
-        return render_template('login.html')
-
-    chatID = request.args.get('chatID')
-    chats = Chat.query.all()
-    # query the chat that the user is in
-    if chatID is not None:
-        current_chat = Chat.query.get(chatID)
-        # get the other user in the chat
-        chat_user = ChatUser.query.filter_by(chatID=chatID).filter(ChatUser.userID != current_user.id).scalar()
-        chat_partner = chat_user.user
-        # get the messages in the chat
-        messages = current_chat.messages
-        return render_template('message.html', chats=chats, current_chat=current_chat, chat_partner=chat_partner,
-                               messages=messages)
-
-    return render_template('message.html', chats=chats)
+@login_required
+def home():
+    friend_requests = Friendship.query.filter(
+        ((Friendship.friendId == current_user.id) & (Friendship.status == "pending")) |
+        ((Friendship.userId == current_user.id) & (Friendship.status == "pending"))
+    ).all()
+    return render_template('home.html', friend_requests=friend_requests)
 
 
-@main_bp.route('/home')
-def home_page():
-    print(current_user)
-    return render_template('home.html')
+
 
 
 @main_bp.route('/uploads/<name>')

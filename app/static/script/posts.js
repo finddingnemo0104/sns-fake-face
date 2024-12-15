@@ -9,6 +9,9 @@ export function togglePostButton(postText, postButton, previewImage) {
 }
 
 document.addEventListener('DOMContentLoaded', async function () {
+    // Thêm sự kiện khi bấm nút chia sẻ trong post
+    copyLinkToClipBoard('posts-container');
+
     // Check empty new post
     const postText = document.querySelector("#new-post-textarea");
     const postImage = document.querySelector("#postImage");
@@ -27,17 +30,14 @@ document.addEventListener('DOMContentLoaded', async function () {
     const postsContainer = document.getElementById('posts-container');
 
     // fetch posts when the page loads
-    // then render each post using the post-element web component
-    const posts = await fetchPosts();
-    posts.forEach(post => {
-        const postElement = document.createElement('post-element');
-        postElement.postID = post.postID;
-        postElement.user = post.user;
-        postElement.content = post.content;
-        postElement.image = post.image;
-        postElement.createdAt = new Date(post.created_at);
-        postsContainer.appendChild(postElement);
-    });
+    // then render each post using the post-element web
+    if (window.location.href.includes("/posts/detail")) {
+        const postID = (location.pathname + location.search).substr(1).split("/detail/")[1]
+        showPostByID(postID);
+    } else {
+        showPosts();
+    }
+
 
     // Event listener for submitting a post
     createPostForm.addEventListener('submit', async function (event) {
@@ -56,14 +56,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         if (response.ok) {
             const post = await response.json();
-            const postElement = document.createElement('post-element');
-            postElement.postID = post.postID;
-            postElement.user = post.user;
-            postElement.content = post.content;
-            postElement.image = post.image;
-            postElement.createdAt = new Date(post.created_at);
             const postsContainer = document.getElementById('posts-container');
-            postsContainer.prepend(postElement);
+            postsContainer.prepend(createPostElement(post));
             createPostForm.reset();
             document.querySelector('#preview-image-container').style.display = 'none';
             postButton.disabled = true;
@@ -105,15 +99,68 @@ document.addEventListener('DOMContentLoaded', async function () {
         document.getElementById('previewImage').removeAttribute("src");
         togglePostButton(postText, postButton, previewImage);
     })
+
+    async function showPosts() {
+        let profileId = null;
+        if (window.location.pathname.includes("/profile")) {
+            profileId = profileUserID;
+        }
+        const posts = await fetchPosts(profileId);
+        posts.forEach((post, index) => {
+            postsContainer.appendChild(createPostElement(post));
+        });
+    }
+
+    async function showPostByID(postID) {
+        const response = await fetch(`/post/${postID}`)
+        const post = await response.json();
+        postsContainer.appendChild(createPostElement(post));
+
+    }
 });
 
 
-async function fetchPosts() {
-    const response = await fetch("/posts");
-    return await response.json();
+async function fetchPosts(profileId) {
+    const searchParams = new URLSearchParams({
+        profileId: profileId
+    })
+    const response = await fetch(`/posts?${searchParams}`);
+    const data = await response.json();
+    return data.posts;
 }
 
+function createPostElement(post) {
+    const postElement = document.createElement('post-element');
+    postElement.postID = post.postID;
+    postElement.user = post.user;
+    postElement.content = post.content;
+    postElement.image = post.image;
+    postElement.createdAt = new Date(post.created_at);
+    postElement.totalLikes = post.totalLikes;
+    postElement.liked = post.liked;
+    postElement.totalComments = post.totalComments;
+    postElement.isOwner = post.isOwner;
+    postElement.comments = post.comments.map((comment) => (
+        {
+            ...comment,
+            createAt: new Date(comment.create_at),
+            updateAt: new Date(comment.update_at),
+        }
+    ))
+    return postElement;
+}
 
-
-
-
+// idParentNode: string. Example: "list-post"
+function copyLinkToClipBoard(idParentNode) {
+    document.getElementById(idParentNode).addEventListener('click', function (event) {
+        let target = event.target; // where was the click?
+        if (target.tagName !== 'A') return;
+        if (target.dataset.action !== 'copy-link') return;
+        let linkText = `${document.location.origin}${target.dataset.link}`;
+        navigator.clipboard.writeText(linkText).then(function () {
+            console.log('Async: Copying to clipboard was successful!');
+        }, function (err) {
+            console.error('Async: Could not copy text: ', err);
+        });
+    })
+}

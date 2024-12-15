@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+
+{% block head %}
+    <link href="/static/style/home.css" rel="stylesheet">
+{% endblock %}
+
+{% block navbar %}
+    {% include "navbar.html" %}
+{% endblock %}
+
+{% block content %}
+    <!-- Bulletin Board (Side Panel) -->
+    <div class="bulletin-board" id="bulletinBoard">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5>Bulletin Board</h5>
+            <!-- Hide Button -->
+            <button class="btn btn-sm btn-outline-secondary" onclick="toggleBulletinBoard()">Hide</button>
+        </div>
+        <ul class="list-unstyled mt-3">
+            <li><a href="#post1" onclick="toggleBulletinBoard()">User 1 commented on your post</a></li>
+            <li><a href="#post2" onclick="toggleBulletinBoard()">User 2 liked your photo</a></li>
+            <li><a href="#post3" onclick="toggleBulletinBoard()">User 3 mentioned you in a comment</a></li>
+        </ul>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-3"></div>
+
+            <!-- Main Content / News Feed -->
+            <div class="col-md-6">
+                <div class="content">
+                    <!-- New Post Area -->
+                    <form id="create-post-form" action="/posts/create" method="post" class="new-post-area d-none"
+                          enctype="multipart/form-data">
+                    <textarea name="content" class="new-post-textarea" rows="3" id="new-post-textarea"
+                              placeholder="Hãy chia sẻ cảm xúc của bạn"></textarea>
+                        <input type="file" id="postImage" class="d-none">
+                        <div style="position: relative; display: none" id="preview-image-container">
+                            <img id="previewImage" alt="Image Preview"
+                                 style="width: 100%; height: auto; margin-top: 10px;">
+                            <i class="bi bi-x-circle-fill ms-auto remove-image-post"></i>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <div>
+                                <label for="postImage" class="icon-picture">
+                                    <i class="bi bi-image"></i>
+                                </label>
+                            </div>
+                            <button class="btn btn-primary" id="post-button" disabled>Đăng</button>
+                        </div>
+                    </form>
+
+                    <!-- Existing Posts -->
+                    <div id="posts-container">
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-md-3"></div>
+
+        </div>
+    </div>
+
+    {% include "delete-post-modal.html" %}
+    {% include "update-post-modal.html" %}
+
+    <script>
+        // Toggle bulletin board visibility
+        function toggleBulletinBoard() {
+            document.getElementById('bulletinBoard').classList.toggle('active');
+        }
+    </script>
+    <script type="module" src="{{ url_for('static', filename='script/posts.js') }}"></script>
+{% endblock %}
