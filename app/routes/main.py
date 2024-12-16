@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, send_from_directory, current_app, jsonify
-from flask_login import  login_required
+from flask_login import login_required
 
 from app import db, login_manager
 from app.Models.chat import Chat
@@ -25,10 +25,25 @@ def home():
         ((Friendship.friendId == current_user.id) & (Friendship.status == "pending")) |
         ((Friendship.userId == current_user.id) & (Friendship.status == "pending"))
     ).all()
-    return render_template('home.html', friend_requests=friend_requests)
 
+    subquery = (
+        db.session.query(Friendship.friendId)
+        .filter(Friendship.userId == current_user.id)
+        .union(
+            db.session.query(Friendship.userId)
+            .filter(Friendship.friendId == current_user.id)
+        )
+    )
 
+    suggested_users = (
+        db.session.query(User)
+        .filter(User.id.not_in(subquery))
+        .filter(User.id != current_user.id)  # Exclude current_user
+        .limit(10)
+        .all()
+    )
 
+    return render_template('home.html', friend_requests=friend_requests, suggesting_users=suggested_users)
 
 
 @main_bp.route('/uploads/<name>')

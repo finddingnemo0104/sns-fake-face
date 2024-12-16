@@ -2,7 +2,7 @@ import traceback
 from datetime import datetime
 
 from flask import Blueprint, url_for, redirect, request, render_template, flash
-from flask_login import current_user, login_user, login_required, logout_user
+from flask_login import  login_user, logout_user
 from sqlalchemy.exc import NoResultFound, IntegrityError
 
 from app import db, login_manager
@@ -32,6 +32,7 @@ def login_page():
             login_user(user)
             return redirect(url_for('main.home'))
         except NoResultFound:
+            flash('Tên đăng nhập hoặc mật khẩu không đúng.', 'error')
             return render_template('login.html')
     else:
         return render_template('login.html')
@@ -66,7 +67,7 @@ def register():
                     errors['dob'] = "Bạn phải đủ 13 tuổi để đăng ký."
                 elif age > 150:
                     errors['dob'] = "Ngày sinh không hợp lệ. Vui lòng kiểm tra lại."
-            if gender not in ['male', 'female', 'other']:
+            if gender not in ['Male', 'Female', 'Other']:
                 errors['gender'] = 'Bạn phải chọn giới tính.'
             if not email:
                 errors['email'] = 'Email không được để trống.'
@@ -87,19 +88,20 @@ def register():
             dob = datetime.strptime(dob, '%Y-%m-%d')
             # Tạo người dùng mới
             user = User(username=username, password=password, name=name, gender=gender,
-                        avatar="/static/image/no-avatar.jpg", cover=None, dob=dob, biography=None,
+                        avatar="/static/image/no-avatar.jpg", dob=dob,
                         email=email, created_at=datetime.now(),
                         updated_at=datetime.now())
             db.session.add(user)
             db.session.commit()
             flash('Đăng ký thành công! Bạn có thể đăng nhập.', 'success')
-            return redirect(url_for('main.home'))
+            return redirect(url_for('authentication.login_page'))
         except IntegrityError as e:
             traceback.print_exc()
             db.session.rollback()
             errors['username'] = 'Tên đăng nhập hoặc email đã tồn tại.'
             return render_template('register.html', errors=errors, form_data=request.form)
         except Exception as e:
+            traceback.print_exc()
             errors['general'] = 'Đã xảy ra lỗi. Vui lòng thử lại sau.'
             return render_template('register.html', errors=errors, form_data=request.form)
     else:
@@ -109,4 +111,4 @@ def register():
 @authentication_bp.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('main.home'))
+    return redirect(url_for('authentication.login_page'))

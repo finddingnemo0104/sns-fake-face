@@ -1,12 +1,15 @@
+import os
 from datetime import datetime
 
-from flask import Blueprint, url_for, redirect, request, render_template, jsonify
+from flask import Blueprint, url_for, redirect, request, render_template, jsonify, current_app
 from flask_login import current_user, login_user, login_required, logout_user
 from sqlalchemy.exc import NoResultFound
+from werkzeug.utils import secure_filename
 
 from app import db, login_manager
 from app.Models.friendship import Friendship
 from app.Models.user import User
+from app.routes.post import allowed_file
 
 user_bp = Blueprint('user', __name__)
 
@@ -58,10 +61,9 @@ def profile_page(userID):
                            profileFriends=profileFriends, totalFriends=totalFriends)
 
 
-@user_bp.route('/friend-request/<friendID>', methods=['POST'])
+@user_bp.route('/friend-request/<friendID>', methods=['GET', 'POST'])
 @login_required
 def send_friend_request(friendID):
-    print("Hello")
     if friendID is not None:
         # check if already sent request
         friendship = Friendship.query.filter_by(userId=current_user.id, friendId=friendID).scalar()
@@ -148,9 +150,13 @@ def list_friends_page(userID):
 @user_bp.route('/users/delete/<int:userID>', methods=['GET'])
 @login_required
 def delete_user(userID):
+    if current_user.id != userID:
+        return "You are not authorized to delete this user", 403
+
     user = User.query.get(userID)
     if not user:
         return "User not found", 404
+
 
     db.session.delete(user)
     db.session.commit()
@@ -188,6 +194,25 @@ def update_user(userID):
 
     db.session.commit()
     return redirect(url_for('user.profile_page', userID=userID))
+
+
+@user_bp.route('/users/update-avatar/', methods=['POST'])
+@login_required
+def update_avatar():
+    user = User.query.get(current_user.id)
+    fileImage = request.files.get('avatar')
+    avatar = ''
+
+    if fileImage and allowed_file(fileImage.filename):
+        filename = secure_filename(fileImage.filename)
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)  # Đường dẫn đầy đủ của file
+        fileImage.save(filepath)
+        avatar = "/static/uploads/" + filename
+
+    user.avatar = avatar
+
+    db.session.commit()
+    return redirect(url_for('user.profile_page', userID=current_user.id))
 
 
 def get_friendship_json(friendship):

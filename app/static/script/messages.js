@@ -35,7 +35,6 @@ if (chatID) {
 
 
     socket.on('connect', function () {
-        console.log('Connected to the server');
         socket.emit('join', {userID: currentUser.userID, chatID: chatID});
     });
 

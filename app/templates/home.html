@@ -24,7 +24,7 @@
         </ul>
     </div>
 
-    <div class="container mt-4">
+    <div class="mx-5 px-2 mt-4">
         <div class="row">
             <!-- Sidebar -->
             {#            <div class="col-md-3">#}
@@ -47,7 +47,7 @@
                         {% for friendship in friend_requests %}
                             {% if friendship.friend.id == current_user.id %}
                                 <div class="d-flex flex-column gap-y-2">
-                                    <div class="d-flex ">
+                                    <div class="d-flex my-1">
                                         <a href="/profile/{{ friendship.user.id }}"
                                            class="d-flex text-decoration-none align-items-center">
                                             <img src="{{ friendship.user.avatar }}" width="32" height="32"
@@ -71,7 +71,7 @@
                         {% for friendship in friend_requests %}
                             {% if friendship.user.id == current_user.id %}
                                 <div class="d-flex flex-column gap-y-2">
-                                    <div class="d-flex ">
+                                    <div class="d-flex my-1">
                                         <a href="/profile/{{ friendship.friend.id }}"
                                            class="d-flex text-decoration-none align-items-center">
                                             <img src="{{ friendship.friend.avatar }}" width="32" height="32"
@@ -120,7 +120,30 @@
                 </div>
             </div>
 
-
+            <div class="col-md-3">
+                <div class="suggestions">
+                    <h5> Gợi ý kết bạn</h5>
+                    {% if suggesting_users %}
+                        <div class="d-flex flex-column gap-y-2">
+                            {% for suggesting_user in suggesting_users %}
+                                <div class="d-flex my-1">
+                                    <a href="/profile/{{ suggesting_user.id }}"
+                                       class="d-flex text-decoration-none align-items-center">
+                                        <img src="{{ suggesting_user.avatar }}" width="32" height="32"
+                                             alt="avatar"/>
+                                        <div class="ms-2">{{ suggesting_user.name }}</div>
+                                    </a>
+                                    <button
+                                            data-profile-id="{{ suggesting_user.id }}"
+                                            class="ms-auto btn btn-primary send-friend-request">
+                                        Kết bạn
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 
@@ -134,6 +157,24 @@
         // Toggle bulletin board visibility
         function toggleBulletinBoard() {
             document.getElementById('bulletinBoard').classList.toggle('active');
+        }
+
+        const sendFriendRequestButtons = document.querySelectorAll('.send-friend-request');
+        if (sendFriendRequestButtons) {
+            sendFriendRequestButtons.forEach((sendFriendRequestButton) => {
+                const profileId = sendFriendRequestButton.dataset.profileId;
+                sendFriendRequestButton.addEventListener('click', async () => {
+                    const response = await fetch(`/friend-request/${profileId}`, {
+                        method: 'POST',
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        sendFriendRequestButton.innerText = data.message;
+                    }
+                })
+            })
+
         }
     </script>
     <script type="module" src="{{ url_for('static', filename='script/posts.js') }}"></script>

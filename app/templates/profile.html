@@ -33,17 +33,23 @@
 
         <!-- Avatar -->
         <div class="row">
-            <div>
+            <div class="position-relative">
                 <img src='{{ user.avatar }}' alt="Avatar" class="avatar">
+                {% if user.id == current_user.id %}
+                    <div class="position-absolute bg-white rounded-circle"
+                         style="top: -100px;left: 100px; z-index: 10;">
+                        <button class="btn btn-edit-avatar">
+                            <i class="bi bi-camera text-primary"></i>
+                        </button>
+                        <input type="file" id="coverPhoto" class="d-none">
+                    </div>
+                {% endif %}
             </div>
 
 
             <!-- Profile Info -->
             <div class="profile-info">
                 <h5 class="mb-0">{{ user.name }}</h5>
-                {% if user.biography %}
-                    <p class="mb-0">{{ user.biography }}</p>
-                {% endif %}
             </div>
             {% if current_user.id != user.id %}
                 <div class="follow-info">
@@ -80,17 +86,11 @@
                         <button class="btn btn-outline-primary"><a class="text-decoration-none"
                                                                    href="/chats/create/{{ user.id }}">Nhắn
                             tin</a></button>
-                        <button class="btn btn-outline-primary">Chặn</button>
                     </div>
                 </div>
             {% endif %}
         </div>
 
-
-        <!-- Edit Button -->
-        <button class="edit-btn">
-            <i class="bi bi-pencil"></i>
-        </button>
     </div>
 
     <!-- Main Content -->
@@ -203,6 +203,44 @@
         function toggleBulletinBoard() {
             document.getElementById('bulletinBoard').classList.toggle('active');
         }
+    </script>
+    <script>
+        // Kích hoạt dialog khi bấm vào button
+        document.querySelector('.btn-edit-avatar').addEventListener('click', function () {
+            document.getElementById('coverPhoto').click();
+        });
+
+        // Hiển thị preview ảnh và gửi dữ liệu qua API sau khi chọn file
+        document.getElementById('coverPhoto').addEventListener('change', async function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Hiển thị preview ảnh
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.querySelector('.avatar').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+                // Tạo FormData và gửi qua API
+                const formData = new FormData();
+                formData.append('avatar', file);
+
+                try {
+                    const response = await fetch('/users/update-avatar/', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        console.log('Avatar updated successfully');
+                    } else {
+                        console.error('Failed to update avatar');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+        });
     </script>
     <script src="/static/script/profile.js"></script>
     <script type="module" src="{{ url_for('static', filename='script/posts.js') }}"></script>

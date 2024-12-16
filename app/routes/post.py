@@ -53,7 +53,7 @@ def get_posts():
     # page means the current page
     page = request.args.get('page', 1, type=int)
     # limit means the number of posts per page
-    limit = request.args.get('limit', 5, type=int)
+    limit = request.args.get('limit', 50, type=int)
     profileId = request.args.get('profileId', type=int)
     if profileId is None:
         # query all posts and order by created_at desc and paginate by page and limit

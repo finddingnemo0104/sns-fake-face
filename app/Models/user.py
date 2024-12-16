@@ -15,10 +15,8 @@ class User(UserMixin, db.Model):
     name: Mapped[str] = mapped_column(String(255))
     gender: Mapped[str] = mapped_column(String(255))
     avatar: Mapped[str] = mapped_column(String(255), nullable=True)
-    cover: Mapped[str] = mapped_column(String(255), nullable=True)
     dob: Mapped[datetime] = mapped_column()
-    biography: Mapped[str] = mapped_column(TEXT, nullable=True)
-    email: Mapped[str] = mapped_column(String(255))
+    email: Mapped[str] = mapped_column(String(255), unique=True)
     created_at: Mapped[datetime] = mapped_column()
     updated_at: Mapped[datetime] = mapped_column()
 

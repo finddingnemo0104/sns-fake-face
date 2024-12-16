@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                       <select required name="gender" class="form-select" id="floatingSelect" aria-label="Floating label select example">
                         <option value="Male" ${user.gender === 'Male' ? "selected" : ""}>Nam</option>
                         <option value="Female" ${user.gender === 'Female' ? "selected" : ""}>Nữ</option>
-                        <option value="other" ${user.gender === 'other' ? "selected" : ""}>Khác</option>
+                        <option value="Other" ${user.gender === 'Other' ? "selected" : ""}>Khác</option>
                       </select>
                       <label for="floatingSelect">Works with selects</label>
                     </div>
